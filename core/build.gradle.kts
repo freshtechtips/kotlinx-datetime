@@ -74,7 +74,9 @@ kotlin {
             }
         }
         // Tier 3
-        target("mingwX64")
+        common("windows") {
+            target("mingwX64")
+        }
     }
 
     jvm {
@@ -127,7 +129,7 @@ kotlin {
     sourceSets.all {
         val suffixIndex = name.indexOfLast { it.isUpperCase() }
         val targetName = name.substring(0, suffixIndex)
-        val suffix = name.substring(suffixIndex).lowercase().takeIf { it != "main" }
+        val suffix = name.substring(suffixIndex).toLowerCase().takeIf { it != "main" }
 //        println("SOURCE_SET: $name")
         kotlin.srcDir("$targetName/${suffix ?: "src"}")
         resources.srcDir("$targetName/${suffix?.let { it + "Resources" } ?: "resources"}")
@@ -143,23 +145,10 @@ kotlin {
         when {
             konanTarget.family == org.jetbrains.kotlin.konan.target.Family.MINGW -> {
                 compilations["main"].cinterops {
-                    create("date") {
-                        val cinteropDir = "$projectDir/native/cinterop"
-                        val dateLibDir = "${project(":").projectDir}/thirdparty/date"
-                        headers("$cinteropDir/public/cdate.h")
-                        defFile("native/cinterop/date.def")
-                        extraOpts("-Xsource-compiler-option", "-I$cinteropDir/public")
-                        extraOpts("-Xsource-compiler-option", "-DONLY_C_LOCALE=1")
-                        // needed to be able to use std::shared_mutex to implement caching.
-                        extraOpts("-Xsource-compiler-option", "-std=c++17")
-                        // the date library headers, needed for some pure calculations.
-                        extraOpts("-Xsource-compiler-option", "-I$dateLibDir/include")
-                        // the main source for the platform bindings.
-                        extraOpts("-Xcompile-source", "$cinteropDir/cpp/windows.cpp")
+                    create("declarations") {
+                        defFile("$projectDir/windows/cinterop/definitions.def")
+                        headers("$projectDir/windows/cinterop/definitions.h")
                     }
-                }
-                compilations["main"].defaultSourceSet {
-                    kotlin.srcDir("native/cinterop_actuals")
                 }
             }
             konanTarget.family == org.jetbrains.kotlin.konan.target.Family.LINUX -> {
@@ -173,8 +162,6 @@ kotlin {
             }
         }
     }
-
-
     sourceSets {
         commonMain {
             dependencies {
@@ -321,8 +308,8 @@ tasks {
 
 val downloadWindowsZonesMapping by tasks.registering {
     description = "Updates the mapping between Windows-specific and usual names for timezones"
-    val output = "$projectDir/native/cinterop/public/windows_zones.hpp"
-    val initialFileContents = File(output).readBytes()
+    val output = "$projectDir/windows/src/WindowsZoneNames.kt"
+    val initialFileContents = try { File(output).readBytes() } catch(e: Throwable) { ByteArray(0) }
     outputs.file(output)
     doLast {
         val documentBuilderFactory = DocumentBuilderFactory.newInstance()
@@ -341,6 +328,7 @@ val downloadWindowsZonesMapping by tasks.registering {
             val windowsName = mapZone.attributes.getNamedItem("other").nodeValue
             val usualNames = mapZone.attributes.getNamedItem("type").nodeValue
             for (usualName in usualNames.split(' ')) {
+                if (usualName == "") continue
                 val oldWindowsName = mapping[usualName] // don't do it in `put` to preserve the order in the map
                 if (oldWindowsName == null) {
                     mapping[usualName] = windowsName
@@ -353,14 +341,16 @@ val downloadWindowsZonesMapping by tasks.registering {
         val bos = ByteArrayOutputStream()
         PrintWriter(bos).use { out ->
             out.println("""// generated with gradle task `$name`""")
-            out.println("""#include <unordered_map>""")
-            out.println("""#include <string>""")
-            out.println("""static const std::unordered_map<std::string, std::string> standard_to_windows = {""")
+            out.println("""package kotlinx.datetime""")
+            out.println("""import kotlin.native.concurrent.SharedImmutable""")
+            out.println("""@SharedImmutable""")
+            out.println("""internal val standardToWindows: Map<String, String> = mutableMapOf(""")
             for ((usualName, windowsName) in sortedMapping) {
-                out.println("\t{ \"$usualName\", \"$windowsName\" },")
+                out.println("  \"$usualName\" to \"$windowsName\",")
             }
-            out.println("};")
-            out.println("""static const std::unordered_map<std::string, std::string> windows_to_standard = {""")
+            out.println(")")
+            out.println("""@SharedImmutable""")
+            out.println("""internal val windowsToStandard: Map<String, String> = mutableMapOf(""")
             val reverseMap = sortedMapOf<String, String>()
             for ((usualName, windowsName) in mapping) {
                 if (reverseMap[windowsName] == null) {
@@ -368,16 +358,9 @@ val downloadWindowsZonesMapping by tasks.registering {
                 }
             }
             for ((windowsName, usualName) in reverseMap) {
-                out.println("\t{ \"$windowsName\", \"$usualName\" },")
+                out.println("  \"$windowsName\" to \"$usualName\",")
             }
-            out.println("};")
-            out.println("""static const std::unordered_map<std::string, size_t> zone_ids = {""")
-            var i = 0
-            for ((usualName, windowsName) in sortedMapping) {
-                out.println("\t{ \"$usualName\", $i },")
-                ++i
-            }
-            out.println("};")
+            out.println(")")
         }
         val newFileContents = bos.toByteArray()
         if (!(initialFileContents contentEquals newFileContents)) {

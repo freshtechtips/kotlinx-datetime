@@ -5,6 +5,11 @@
 
 package kotlinx.datetime
 
+import kotlinx.datetime.format.*
+import kotlinx.datetime.format.COMPACT_OFFSET
+import kotlinx.datetime.format.ISO_OFFSET
+import kotlinx.datetime.format.ISO_OFFSET_BASIC
+import kotlinx.datetime.format.UtcOffsetFormat
 import kotlinx.datetime.internal.JSJoda.ZoneOffset
 import kotlinx.datetime.serializers.UtcOffsetSerializer
 import kotlinx.serialization.Serializable
@@ -27,9 +32,17 @@ public actual class UtcOffset(internal val zoneOffset: ZoneOffset) {
             if (e.isJodaDateTimeException()) throw DateTimeFormatException(e)
             throw e
         }
+
+        @Suppress("FunctionName")
+        public actual fun Format(block: UtcOffsetFormatBuilderFields.() -> Unit): DateTimeFormat<UtcOffset> =
+            UtcOffsetFormat.build(block)
     }
 
-    public actual object Format;
+    public actual object Formats {
+        public actual val ISO: DateTimeFormat<UtcOffset> get() = ISO_OFFSET
+        public actual val ISO_BASIC: DateTimeFormat<UtcOffset> get() = ISO_OFFSET_BASIC
+        public actual val COMPACT: DateTimeFormat<UtcOffset> get() = COMPACT_OFFSET
+    }
 }
 
 @Suppress("ACTUAL_FUNCTION_WITH_DEFAULT_ARGUMENTS")

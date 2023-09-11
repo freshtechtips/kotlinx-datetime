@@ -34,18 +34,18 @@ class TimeZoneRulesCompleteTest {
                         val infoAt1 = rules.infoAtDatetime(beforeTransition.localDateTime)
                         val infoAt2 = rules.infoAtDatetime(afterTransition.localDateTime)
                         assertEquals(infoAt1, infoAt2)
-                        assertIs<Regular>(infoAt1)
+                        assertIs<OffsetInfo.Regular>(infoAt1)
                     } else if (afterTransition.localDateTime < beforeTransition.localDateTime) {
                         // Overlap
                         val infoAt1 = rules.infoAtDatetime(beforeTransition.localDateTime.plusSeconds(-1))
                         val infoAt2 = rules.infoAtDatetime(afterTransition.localDateTime.plusSeconds(1))
                         assertEquals(infoAt1, infoAt2)
-                        assertIs<Overlap>(infoAt1)
+                        assertIs<OffsetInfo.Overlap>(infoAt1)
                     } else if (afterTransition.localDateTime > beforeTransition.localDateTime) {
                         // Gap
                         val infoAt1 = rules.infoAtDatetime(afterTransition.localDateTime.plusSeconds(-1))
                         val infoAt2 = rules.infoAtDatetime(beforeTransition.localDateTime.plusSeconds(1))
-                        assertIs<Gap>(infoAt1)
+                        assertIs<OffsetInfo.Gap>(infoAt1)
                         assertEquals(infoAt1, infoAt2)
                     }
                 } catch (e: Throwable) {

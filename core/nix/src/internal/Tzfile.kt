@@ -203,23 +203,23 @@ private fun BinaryDataReader.readPosixTzString(): PosixTzString? {
     var c = readAsciiChar()
     fun readName(): String? {
         if (c == '\n') return null
-        var name = ""
+        val name = StringBuilder()
         if (c == '<') {
             c = readAsciiChar()
             while (c != '>') {
                 check(c.isLetterOrDigit() || c == '-' || c == '+') { "Invalid char '$c' in the std name in POSIX TZ string" }
-                name += c
+                name.append(c)
                 c = readAsciiChar()
             }
             c = readAsciiChar()
         } else {
             while (c.isLetter()) {
-                name += c
+                name.append(c)
                 c = readAsciiChar()
             }
         }
         check(name.isNotEmpty()) { "Empty std name in POSIX TZ string" }
-        return name
+        return name.toString()
     }
 
     fun readOffset(): UtcOffset? {

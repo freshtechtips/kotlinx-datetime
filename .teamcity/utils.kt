@@ -10,6 +10,7 @@ const val teamcitySuffixParameter = "teamcitySuffix"
 const val releaseVersionParameter = "releaseVersion"
 
 const val libraryStagingRepoDescription = "Kotlin-DateTime-library"
+const val singleAgentMacDeployment: Boolean = true
 
 val platforms = Platform.values()
 const val jdk = "JDK_18_x64"

@@ -1,5 +1,5 @@
 plugins {
-    id("kotlinx.team.infra") version "0.3.0-dev-77"
+    id("kotlinx.team.infra") version "0.3.0-dev-78-test"
     kotlin("multiplatform") apply false
 }
 
@@ -9,6 +9,7 @@ infra {
     publishing {
         include(":kotlinx-datetime")
         libraryRepoUrl = "https://github.com/Kotlin/kotlinx-datetime"
+        singleAgentMacDeployment = true
         sonatype {
             libraryStagingRepoDescription = project.name
         }

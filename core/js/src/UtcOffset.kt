@@ -6,7 +6,7 @@
 package kotlinx.datetime
 
 import kotlinx.datetime.format.*
-import kotlinx.datetime.format.COMPACT_OFFSET
+import kotlinx.datetime.format.FOUR_DIGIT_OFFSET
 import kotlinx.datetime.format.ISO_OFFSET
 import kotlinx.datetime.format.ISO_OFFSET_BASIC
 import kotlinx.datetime.format.UtcOffsetFormat
@@ -41,7 +41,7 @@ public actual class UtcOffset(internal val zoneOffset: ZoneOffset) {
     public actual object Formats {
         public actual val ISO: DateTimeFormat<UtcOffset> get() = ISO_OFFSET
         public actual val ISO_BASIC: DateTimeFormat<UtcOffset> get() = ISO_OFFSET_BASIC
-        public actual val COMPACT: DateTimeFormat<UtcOffset> get() = COMPACT_OFFSET
+        public actual val FOUR_DIGITS: DateTimeFormat<UtcOffset> get() = FOUR_DIGIT_OFFSET
     }
 }
 

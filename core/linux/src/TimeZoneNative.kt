@@ -3,6 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 License that can be found in the LICENSE.txt file.
  */
 
+@file:OptIn(ExperimentalForeignApi::class)
 package kotlinx.datetime
 
 import kotlinx.cinterop.*
@@ -64,8 +65,8 @@ internal actual fun currentTime(): Instant = memScoped {
         val errorStr: String = strerror(errno)?.toKString() ?: "Unknown error"
         throw IllegalStateException("Could not obtain the current clock readings from the system: $errorStr")
     }
-    val seconds: Long = tm.tv_sec
-    val nanoseconds: Int = tm.tv_nsec.toInt()
+    val seconds: Long = tm.tv_sec.convert<Long>()
+    val nanoseconds: Int = tm.tv_nsec.convert<Int>()
     try {
         require(nanoseconds in 0 until NANOS_PER_ONE)
         return Instant(seconds, nanoseconds)
@@ -74,5 +75,4 @@ internal actual fun currentTime(): Instant = memScoped {
     }
 }
 
-@ThreadLocal
 private val tzdbOnFilesystem = TzdbOnFilesystem(Path.fromString("/usr/share/zoneinfo"))

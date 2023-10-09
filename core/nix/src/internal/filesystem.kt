@@ -3,6 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 License that can be found in the LICENSE.txt file.
  */
 
+@file:OptIn(ExperimentalForeignApi::class)
 package kotlinx.datetime.internal
 
 import kotlinx.cinterop.*
@@ -80,7 +81,6 @@ internal fun Path.traverseDirectory(exclude: Set<String> = emptySet(), stripLead
         closedir(handler)
     }
 }
-
 
 internal fun Path.readBytes(): ByteArray {
     val handler = fopen(this.toString(), "rb") ?: throw RuntimeException("Cannot open file $this")

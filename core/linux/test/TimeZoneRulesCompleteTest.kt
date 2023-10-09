@@ -59,6 +59,7 @@ class TimeZoneRulesCompleteTest {
     }
 }
 
+@OptIn(ExperimentalForeignApi::class)
 private inline fun runUnixCommand(command: String): Sequence<String> = sequence {
     val pipe = popen(command, "r") ?: error("Failed to run command: $command")
     try {

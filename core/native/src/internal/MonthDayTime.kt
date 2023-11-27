@@ -27,24 +27,28 @@ internal interface DateOfYear {
 }
 
 /**
- * The day of year, in the 1..365 range. During leap years, 29th February is counted as the 60th day of the year.
+ * The day of year, in the 0..365 range. During leap years, 29th February is counted as the 60th day of the year.
  * The number 366 is not supported, as outside the leap years, there are only 365 days in a year.
  */
-internal class JulianDayOfYear(val dayOfYear: Int) : DateOfYear {
+internal class JulianDayOfYear(val zeroBasedDayOfYear: Int) : DateOfYear {
     init {
-        require(dayOfYear in 1..365)
+        require(zeroBasedDayOfYear in 0..365) {
+            "Expected a value in 1..365 for the Julian day-of-year, but got $zeroBasedDayOfYear"
+        }
     }
     override fun toLocalDate(year: Int): LocalDate =
-        LocalDate(year, 1, 1).plusDays(dayOfYear - 1)
+        LocalDate(year, 1, 1).plusDays(zeroBasedDayOfYear)
 
-    override fun toString(): String = "JulianDayOfYear($dayOfYear)"
+    override fun toString(): String = "JulianDayOfYear($zeroBasedDayOfYear)"
 }
 
 /**
  * The day of year, in the 1..365 range. During leap years, 29th February is skipped.
  */
 internal fun JulianDayOfYearSkippingLeapDate(dayOfYear: Int) : DateOfYear {
-    require(dayOfYear in 1..365)
+    require(dayOfYear in 1..365) {
+        "Expected a value in 1..365 for the Julian day-of-year (skipping the leap date), but got $dayOfYear"
+    }
     // In this form, the `dayOfYear` corresponds exactly to a specific month and day.
     // For example, `dayOfYear = 60` is always 1st March, even in leap years.
     // We take a non-leap year, as in that case, this is the same as JulianDayOfYear, so regular addition works.

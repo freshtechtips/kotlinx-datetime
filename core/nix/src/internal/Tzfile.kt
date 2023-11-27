@@ -175,7 +175,7 @@ internal class PosixTzString(
         /**
          * Reads a POSIX TZ string from the [reader] if it is present, or returns `null` if it is not.
          *
-         * The string format is described in * https://pubs.opengroup.org/onlinepubs/9699919799/, section 8.3,
+         * The string format is described in https://pubs.opengroup.org/onlinepubs/9699919799/, section 8.3,
          * with additional extensions in https://datatracker.ietf.org/doc/html/rfc8536#section-3.3.1
          *
          * @throws IllegalArgumentException if the string is invalid

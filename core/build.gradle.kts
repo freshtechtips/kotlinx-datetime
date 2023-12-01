@@ -130,7 +130,7 @@ kotlin {
     sourceSets.all {
         val suffixIndex = name.indexOfLast { it.isUpperCase() }
         val targetName = name.substring(0, suffixIndex)
-        val suffix = name.substring(suffixIndex).toLowerCase().takeIf { it != "main" }
+        val suffix = name.substring(suffixIndex).lowercase().takeIf { it != "main" }
 //        println("SOURCE_SET: $name")
         kotlin.srcDir("$targetName/${suffix ?: "src"}")
         resources.srcDir("$targetName/${suffix?.let { it + "Resources" } ?: "resources"}")
@@ -344,14 +344,11 @@ val downloadWindowsZonesMapping by tasks.registering {
         PrintWriter(bos).use { out ->
             out.println("""// generated with gradle task `$name`""")
             out.println("""package kotlinx.datetime""")
-            out.println("""import kotlin.native.concurrent.SharedImmutable""")
-            out.println("""@SharedImmutable""")
             out.println("""internal val standardToWindows: Map<String, String> = mutableMapOf(""")
             for ((usualName, windowsName) in sortedMapping) {
                 out.println("  \"$usualName\" to \"$windowsName\",")
             }
             out.println(")")
-            out.println("""@SharedImmutable""")
             out.println("""internal val windowsToStandard: Map<String, String> = mutableMapOf(""")
             val reverseMap = sortedMapOf<String, String>()
             for ((usualName, windowsName) in mapping) {

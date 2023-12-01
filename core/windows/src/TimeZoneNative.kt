@@ -57,7 +57,6 @@ internal actual class RegionTimeZone(private val tzid: TimeZoneRules, actual ove
     actual override fun offsetAtImpl(instant: Instant): UtcOffset = tzid.infoAtInstant(instant)
 }
 
-@SharedImmutable
 private val tzdbInRegistry = TzdbInRegistry()
 
 internal actual fun currentTime(): Instant = memScoped {

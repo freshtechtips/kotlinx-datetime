@@ -1,7 +1,5 @@
 // generated with gradle task `downloadWindowsZonesMapping`
 package kotlinx.datetime
-import kotlin.native.concurrent.SharedImmutable
-@SharedImmutable
 internal val standardToWindows: Map<String, String> = mutableMapOf(
   "Africa/Abidjan" to "Greenwich Standard Time",
   "Africa/Accra" to "Greenwich Standard Time",
@@ -465,7 +463,6 @@ internal val standardToWindows: Map<String, String> = mutableMapOf(
   "Pacific/Wallis" to "UTC+12",
   "UTC" to "UTC",
 )
-@SharedImmutable
 internal val windowsToStandard: Map<String, String> = mutableMapOf(
   "AUS Central Standard Time" to "Australia/Darwin",
   "AUS Eastern Standard Time" to "Australia/Sydney",

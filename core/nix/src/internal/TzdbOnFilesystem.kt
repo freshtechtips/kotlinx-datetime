@@ -5,12 +5,14 @@
 
 package kotlinx.datetime.internal
 
-internal class TzdbOnFilesystem(defaultTzdbPath: Path) {
+import kotlinx.datetime.*
 
-    internal fun rulesForId(id: String): TimeZoneRules =
+internal class TzdbOnFilesystem(defaultTzdbPath: Path): TimezoneDatabase {
+
+    override fun rulesForId(id: String): TimeZoneRules =
         readTzFile(tzdbPath.resolve(Path.fromString(id)).readBytes()).toTimeZoneRules()
 
-    internal fun availableTimeZoneIds(): Set<String> = buildSet {
+    override fun availableTimeZoneIds(): Set<String> = buildSet {
         tzdbPath.traverseDirectory(exclude = tzdbUnneededFiles) { add(it.toString()) }
     }
 
